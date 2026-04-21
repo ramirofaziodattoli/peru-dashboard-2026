@@ -5,8 +5,13 @@ const anon = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
 export const isConfigured = Boolean(url && anon);
 
-// Creamos el cliente aunque falten envs para no romper el SSR;
-// los callers deben chequear `isConfigured` antes de usarlo.
-export const supabase = createClient(url ?? "http://placeholder", anon ?? "placeholder");
+/* Usamos un placeholder **válido** cuando faltan las env vars.
+   `createClient("")` tira "supabaseUrl is required" durante el prerender de Next.
+   Con un placeholder no rompe — y los callers igual chequean `isConfigured`
+   antes de hacer queries, así que nunca se llega a conectar a esa URL fake. */
+export const supabase = createClient(
+  url || "https://placeholder.supabase.co",
+  anon || "placeholder-anon-key",
+);
 
 export type Json = Record<string, unknown>;
