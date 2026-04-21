@@ -18,6 +18,32 @@ export default function TripHub() {
   const [showNameModal, setShowNameModal] = useState(false);
   const [filter, setFilter] = useState<FilterMode>("all");
 
+  /* ⚠️ IMPORTANTE: todos los hooks ANTES del early return.
+     Si no, React error #310 (hook order change entre renders). */
+  const checklistDone = useMemo(
+    () => CHECKLIST.filter((c) => (state[c.key]?.value as any)?.checked).length,
+    [state],
+  );
+  const myItems = useMemo(
+    () => CHECKLIST.filter((c) => c.owner === user || c.owner === "Todos"),
+    [user],
+  );
+  const myDone = useMemo(
+    () => myItems.filter((c) => (state[c.key]?.value as any)?.checked).length,
+    [state, myItems],
+  );
+  const visibleChecklist = useMemo(() => {
+    let items = CHECKLIST;
+    if (filter === "mine" && user) items = CHECKLIST.filter((c) => c.owner === user || c.owner === "Todos");
+    else if (filter === "Rami" || filter === "Tomi" || filter === "Nati")
+      items = CHECKLIST.filter((c) => c.owner === filter || c.owner === "Todos");
+    return [...items].sort((a, b) => {
+      const ac = (state[a.key]?.value as any)?.checked ? 1 : 0;
+      const bc = (state[b.key]?.value as any)?.checked ? 1 : 0;
+      return ac - bc;
+    });
+  }, [filter, user, state]);
+
   if (!ready) return null;
 
   const needsName = !user;
@@ -44,33 +70,6 @@ export default function TripHub() {
     if (!user) { promptName(); return; }
     updateEntity(key, { checked }, user);
   };
-
-  /* ---------- Progreso + filtro ---------- */
-  const checklistDone = useMemo(
-    () => CHECKLIST.filter((c) => (state[c.key]?.value as any)?.checked).length,
-    [state],
-  );
-  const myItems = useMemo(
-    () => CHECKLIST.filter((c) => c.owner === user || c.owner === "Todos"),
-    [user],
-  );
-  const myDone = useMemo(
-    () => myItems.filter((c) => (state[c.key]?.value as any)?.checked).length,
-    [state, myItems],
-  );
-
-  const visibleChecklist = useMemo(() => {
-    let items = CHECKLIST;
-    if (filter === "mine" && user) items = CHECKLIST.filter((c) => c.owner === user || c.owner === "Todos");
-    else if (filter === "Rami" || filter === "Tomi" || filter === "Nati")
-      items = CHECKLIST.filter((c) => c.owner === filter || c.owner === "Todos");
-    // Orden: no-hechos primero, hechos al fondo
-    return [...items].sort((a, b) => {
-      const ac = (state[a.key]?.value as any)?.checked ? 1 : 0;
-      const bc = (state[b.key]?.value as any)?.checked ? 1 : 0;
-      return ac - bc;
-    });
-  }, [filter, user, state]);
 
   const EditorBy = ({ entKey }: { entKey: string }) => {
     const e = get(entKey);
