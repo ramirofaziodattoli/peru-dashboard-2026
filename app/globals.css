@@ -1,0 +1,21 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap");
+
+html { scroll-behavior: smooth; }
+
+body {
+  background: #faf7f2;
+  color: #1a1a1a;
+  font-family: Inter, system-ui, -apple-system, sans-serif;
+  font-size: 15px;
+  line-height: 1.55;
+}
+
+[contenteditable="true"]:focus { outline: none; }
+
+/* Scrollbar */
+.mural-feed::-webkit-scrollbar { width: 8px; }
+.mural-feed::-webkit-scrollbar-thumb { background: #e0d8c8; border-radius: 4px; }
