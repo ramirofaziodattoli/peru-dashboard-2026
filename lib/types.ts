@@ -43,4 +43,6 @@ export interface ChecklistInfo {
   owner: UserName | "Todos";
   sub?: string;
   subHtml?: string;
+  bookingUrl?: string;
+  bookingLabel?: string;
 }
